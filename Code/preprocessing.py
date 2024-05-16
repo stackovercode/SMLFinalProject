@@ -31,10 +31,6 @@ df = pd.read_csv(data_path, header=None, skiprows=1)
 col_names = ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'class']
 df.columns = col_names
 
-# Inspect the data for non-numeric values
-print(df.head())
-print(df.dtypes)
-
 # Convert numerical columns to float and handle errors
 for col in col_names[:-1]:
     df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -42,12 +38,12 @@ for col in col_names[:-1]:
 # Encode target class as categorical integer labels
 df['class'] = pd.Categorical(df['class']).codes
 
-# Sample the data to reduce size for quicker processing (5% subset)
-df_sample = df.sample(frac=0.05, random_state=42)
+# Sample the data to reduce size for quicker processing (1% subset)
+df_sample = df.sample(frac=0.01, random_state=42)
 
 # Plot original data (before handling missing values) on the sampled data
 plt.figure(figsize=(20, 10))
-sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=False)
 plt.title('Missing Values in Sampled Dataset')
 plt.savefig(missing_values_before_path)
 # plt.show()
@@ -58,7 +54,7 @@ df_missing = df_sample[df_sample.isnull().any(axis=1)]
 if not df_missing.empty:
     # Plot rows with missing values from the sampled data
     plt.figure(figsize=(20, 10))
-    sns.heatmap(df_missing.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+    sns.heatmap(df_missing.isnull(), cbar=False, cmap='viridis', yticklabels=False)
     plt.title('Rows with Missing Values in Sampled Data')
     plt.savefig(missing_values_rows_path)
     # plt.show()
@@ -68,7 +64,7 @@ df_sample.dropna(inplace=True)
 
 # Plot data after handling missing values in the sampled data
 plt.figure(figsize=(20, 10))
-sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=False)
 plt.title('After Handling Missing Values in Sampled Data')
 plt.savefig(missing_values_after_path)
 # plt.show()
