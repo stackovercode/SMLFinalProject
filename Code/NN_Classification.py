@@ -28,24 +28,6 @@ from sklearn.metrics import confusion_matrix, mean_squared_error, mean_absolute_
 """# Part 1: Load and clean the data"""
 
 
-# from sklearn.preprocessing import StandardScaler
-
-# # Assuming 'data' is loaded as a DataFrame similar to the car dataset example
-# X = data.iloc[:, 1:]  # all rows, all columns except the first column (labels)
-# y = data.iloc[:, 0]   # all rows, first column only (labels)
-
-# # Normalize the features
-# scaler = StandardScaler()
-# X_scaled = scaler.fit_transform(X)
-
-# # Split into training and testing sets
-# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
-
-# # Initialize and train the MLP
-# mlp = MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, activation='relu', random_state=42)
-# mlp.fit(X_train, y_train)
-
-
 # Load the data.
 data = '4_Classification of Robots from their conversation sequence_Set2.csv'
 df = pd.read_csv(data, header=None)
@@ -281,21 +263,21 @@ plt.ylabel('True Label')
 plt.xlabel('Predicted Label')
 plt.title('Confusion Matrix for GridSearchCV MLP');
 
-# Ploting metrics
-errors=['Accuracy','CV-accuracy','MSE', 'MAE']
+# # Ploting metrics
+# errors=['Accuracy','CV-accuracy','MSE', 'MAE']
 
-fig = go.Figure(data=[
-    go.Bar(name='MLP', x=errors, y=[mlp.score(X_test, y_test),mlp_cv.mean(),mean_squared_error(y_test, mlp_pred), mean_absolute_error(y_test, mlp_pred)]),
-    go.Bar(name='GridSearchCV+MLP', x=errors, y=[gs_mlp.score(X_test, y_test),gs_mlp.best_score_,mean_squared_error(y_test, gs_mlp_pred), mean_absolute_error(y_test, gs_mlp_pred)])
-])
+# fig = go.Figure(data=[
+#     go.Bar(name='MLP', x=errors, y=[mlp.score(X_test, y_test),mlp_cv.mean(),mean_squared_error(y_test, mlp_pred), mean_absolute_error(y_test, mlp_pred)]),
+#     go.Bar(name='GridSearchCV+MLP', x=errors, y=[gs_mlp.score(X_test, y_test),gs_mlp.best_score_,mean_squared_error(y_test, gs_mlp_pred), mean_absolute_error(y_test, gs_mlp_pred)])
+# ])
 
-fig.update_layout(
-    title='Metrics for each model',
-    xaxis_tickfont_size=14,
-    barmode='group',
-    bargap=0.15, # gap between bars of adjacent location coordinates.
-    bargroupgap=0.1 # gap between bars of the same location coordinate.
-)
-fig.show()
+# fig.update_layout(
+#     title='Metrics for each model',
+#     xaxis_tickfont_size=14,
+#     barmode='group',
+#     bargap=0.15, # gap between bars of adjacent location coordinates.
+#     bargroupgap=0.1 # gap between bars of the same location coordinate.
+# )
+# fig.show()
 
 """## **Task: Compare the outcomes of the Neural Network training with previously trained models in previous lectures.**"""

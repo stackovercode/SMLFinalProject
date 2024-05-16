@@ -11,7 +11,7 @@ from sklearn.decomposition import PCA
 data_path = './4_Classification of Robots from their conversation sequence_Set2.csv'
 
 # Define directory for saving plots
-plot_dir = './TestingPlots'
+plot_dir = './TestingPlots/'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
 

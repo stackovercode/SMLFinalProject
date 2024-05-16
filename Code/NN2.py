@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import os
 import numpy as np
 
 from sklearn.preprocessing import StandardScaler, label_binarize
@@ -19,7 +19,19 @@ print(tf.config.list_physical_devices())
 
 
 # Load and prepare the dataset
-data = '4_Classification of Robots from their conversation sequence_Set2.csv'
+data = './4_Classification of Robots from their conversation sequence_Set2.csv'
+
+# Define directory for saving plots
+plot_dir = './TestingPlots/neural_network'
+if not os.path.exists(plot_dir):
+    os.makedirs(plot_dir)
+
+
+ROC_plot = os.path.join(plot_dir, 'ROC_plot.png')
+confusion_plot = os.path.join(plot_dir, 'confusion_plot.png')
+training_history = os.path.join(plot_dir, 'training_history.png')
+
+
 df = pd.read_csv(data)
 df_sample = df.sample(frac=0.1, random_state=42)
 X = df_sample.iloc[:, 1:].values
@@ -82,8 +94,9 @@ plt.plot(all_fpr, mean_tpr, color='blue', label='Mean ROC (area = %0.2f)' % auc(
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
+plt.savefig(ROC_plot)
 plt.legend(loc="lower right")
-plt.show()
+#plt.show()
 
 
 # Evaluate the model on the test set
@@ -101,7 +114,8 @@ sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
 plt.xlabel('Predicted Labels')
 plt.ylabel('True Labels')
 plt.title('Confusion Matrix')
-plt.show()
+plt.savefig(confusion_plot)
+#plt.show()
 
 
 # Plot training history
@@ -110,5 +124,6 @@ plt.plot(history.history['val_accuracy'], label='val_accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.ylim([0, 1])
+plt.savefig(training_history)
 plt.legend(loc='lower right')
-plt.show()  
+#plt.show()  
