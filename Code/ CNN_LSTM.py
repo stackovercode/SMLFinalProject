@@ -1,25 +1,28 @@
 import tensorflow as tf
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-import os
-
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Dropout, Flatten, Input
 from sklearn.preprocessing import StandardScaler, label_binarize
 from sklearn.model_selection import train_test_split
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_score, recall_score, f1_score, mean_squared_error, mean_absolute_error
-from numpy import interp  
+from numpy import interp 
 from itertools import cycle
 
 # Check available devices, look for GPU
 print("Available devices:")
 print(tf.config.list_physical_devices())
 
-# Load and prepare the dataset
+# Load and preprocess the dataset
 data = './4_Classification of Robots from their conversation sequence_Set2.csv'
+df = pd.read_csv(data)
+df_sample = df.sample(frac=0.01, random_state=42)
 
 # Define directory for saving plots
-plot_dir = './TestingPlots/neural_network'
+plot_dir = './TestingPlots/CNN_LSTM'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
 
@@ -27,18 +30,15 @@ ROC_plot = os.path.join(plot_dir, 'ROC_plot.png')
 confusion_plot = os.path.join(plot_dir, 'confusion_plot.png')
 training_history = os.path.join(plot_dir, 'training_history.png')
 
-df = pd.read_csv(data)
-df_sample = df.sample(frac=0.01, random_state=42)
-
 # Display information about the DataFrame
 df_sample.info()
 
-# Check for missing values.
+# Check for missing values
 if df_sample.isna().any().any():
     print("Missing values detected. Handling missing values by dropping rows with NaNs.")
     df_sample.dropna(inplace=True)  # Remove rows with any NaN values
 
-# Check for duplicate rows.
+# Check for duplicate rows
 if df_sample.duplicated().any():
     print("Duplicate rows detected. Removing duplicates.")
     df_sample.drop_duplicates(inplace=True)
@@ -55,29 +55,38 @@ n_classes = y_bin.shape[1]
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
+# Reshape for CNN input (samples, time steps, features)
+X_scaled = X_scaled.reshape((X_scaled.shape[0], X_scaled.shape[1], 1))
+
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_bin, test_size=0.3, random_state=42)
 
-# Define the TensorFlow model
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(n_classes, activation='softmax')
+# Define the CNN + LSTM model
+model = Sequential([
+    Input(shape=(X_train.shape[1], X_train.shape[2])),
+    Conv1D(32, kernel_size=3, activation='relu'),
+    MaxPooling1D(pool_size=2),
+    LSTM(64, activation='relu'),
+    Dropout(0.2),
+    Dense(n_classes, activation='softmax')
 ])
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 
 # Train the model with more epochs and save the best model
-checkpoint = tf.keras.callbacks.ModelCheckpoint('NN_best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
+checkpoint = tf.keras.callbacks.ModelCheckpoint('best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
 early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 history = model.fit(X_train, y_train, epochs=50, validation_split=0.2, callbacks=[checkpoint, early_stopping])
 
 # Load the best model
-model.load_weights('NN_best_model.keras')
+model.load_weights('best_model.keras')
 
 # Predict probabilities on the test set
 y_pred_proba = model.predict(X_test)
+
+# Evaluate the model on the test set
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print('Test accuracy:', test_acc)
 
 # Compute ROC curve and ROC area for each class
 fpr = dict()
@@ -97,7 +106,7 @@ mean_tpr /= n_classes
 
 # Plot the ROC curve for each class and the mean ROC curve
 plt.figure(figsize=(10, 8))  # Increase figure size for better readability
-colors = ['aqua', 'darkorange', 'cornflowerblue', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive']  # Add more colors for more classes
+colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive'])  # Add more colors for more classes
 for i, color in zip(range(n_classes), colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=2,
              label='ROC curve of class {0} (area = {1:0.2f})'.format(i, roc_auc[i]))
@@ -122,10 +131,6 @@ plt.grid(alpha=0.4)  # Add a subtle grid
 
 plt.savefig(ROC_plot)  # Save the figure
 plt.show()  # Display the figure
-
-# Evaluate the model on the test set
-test_loss, test_acc = model.evaluate(X_test, y_test)
-print('Test accuracy:', test_acc)
 
 # Predict classes
 y_pred_classes = np.argmax(y_pred_proba, axis=1)
