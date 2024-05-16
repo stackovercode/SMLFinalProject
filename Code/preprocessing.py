@@ -1,9 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import os
 
 # Load dataset
-data = '4_Classification of Robots from their conversation sequence_Set2.csv'
+data = '../4_Classification of Robots from their conversation sequence_Set2.csv'
 df = pd.read_csv(data, header=None)
 
 # Assign column names
