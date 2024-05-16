@@ -37,7 +37,7 @@ df['class'] = pd.Categorical(df['class']).codes  # Convert to categorical codes 
 df.dropna(inplace=True)
 
 # Sample the data to reduce size for quicker processing
-df_sample = df.sample(frac=0.01, random_state=42)
+df_sample = df.sample(frac=0.005, random_state=42)
 
 # Split dataset into features and target variable
 X = df_sample.drop('class', axis=1)
