@@ -2,17 +2,14 @@ import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 import numpy as np
+import os
 
 from sklearn.preprocessing import StandardScaler, label_binarize
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import GridSearchCV, train_test_split, cross_val_score
-from sklearn.metrics import confusion_matrix, mean_squared_error, mean_absolute_error, roc_curve, auc
-
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_score, recall_score, f1_score
 from scipy import interp
 from itertools import cycle
-
 # Check available devices, look for GPU
 print("Available devices:")
 print(tf.config.list_physical_devices())
@@ -33,30 +30,30 @@ training_history = os.path.join(plot_dir, 'training_history.png')
 
 
 df = pd.read_csv(data)
-df_sample = df.sample(frac=0.1, random_state=42)
+df_sample = df.sample(frac=0.02, random_state=42)
+
+# Assuming the first column is the label and the rest are features
 X = df_sample.iloc[:, 1:].values
 y = df_sample.iloc[:, 0].values
+
+# Binarize the labels for multi-class classification
 y_bin = label_binarize(y, classes=np.unique(y))
 n_classes = y_bin.shape[1]
 
-
-# Randomly sample 10% of the dataset
-df_sample = df.sample(frac=0.1, random_state=42)
 
 # Separate features and target
 X = df_sample.iloc[:, 1:].values  # Assuming the first column is the label
 y = df_sample.iloc[:, 0].values
 
-# Normalize the features and split the data
+
+# Normalize the features
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
+
+# Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_bin, test_size=0.3, random_state=42)
 
-
-# # Split into training and testing sets
-# X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
-
-# Define and train the TensorFlow model
+# Define the TensorFlow model
 model = tf.keras.Sequential([
     tf.keras.layers.Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
     tf.keras.layers.Dropout(0.2),
@@ -66,9 +63,15 @@ model = tf.keras.Sequential([
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 model.summary()
 
-history = model.fit(X_train, y_train, epochs=10, validation_split=0.2)
+# Train the model with more epochs and save the best model
+checkpoint = tf.keras.callbacks.ModelCheckpoint('best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+history = model.fit(X_train, y_train, epochs=50, validation_split=0.2, callbacks=[checkpoint, early_stopping])
 
-# Predict probabilities
+# Load the best model
+model.load_weights('best_model.keras')
+
+# Predict probabilities on the test set
 y_pred_proba = model.predict(X_test)
 
 # Compute ROC curve and ROC area for each class
@@ -77,8 +80,7 @@ tpr = dict()
 roc_auc = dict()
 all_fpr = np.unique(np.concatenate([roc_curve(y_test[:, i], y_pred_proba[:, i])[0] for i in range(n_classes)]))
 
-
-# Then interpolate all ROC curves at this points
+# Interpolate all ROC curves at this points
 mean_tpr = np.zeros_like(all_fpr)
 for i in range(n_classes):
     fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_pred_proba[:, i])
@@ -88,9 +90,17 @@ for i in range(n_classes):
 # Finally average it and compute AUC
 mean_tpr /= n_classes
 
-# Plot the ROC curve
+# Plot the ROC curve for each class and the mean ROC curve
 plt.figure()
-plt.plot(all_fpr, mean_tpr, color='blue', label='Mean ROC (area = %0.2f)' % auc(all_fpr, mean_tpr))
+colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
+for i, color in zip(range(n_classes), colors):
+    plt.plot(fpr[i], tpr[i], color=color, lw=2,
+             label='ROC curve of class {0} (area = {1:0.2f})'
+             ''.format(i, roc_auc[i]))
+
+plt.plot(all_fpr, mean_tpr, color='blue', linestyle='--',
+         label='Mean ROC (area = %0.2f)' % auc(all_fpr, mean_tpr))
+
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
@@ -104,11 +114,11 @@ test_loss, test_acc = model.evaluate(X_test, y_test)
 print('Test accuracy:', test_acc)
 
 # Predict classes
-y_pred = model.predict(X_test)
-y_pred_classes = np.argmax(y_pred, axis=1)
+y_pred_classes = np.argmax(y_pred_proba, axis=1)
+y_test_classes = np.argmax(y_test, axis=1)
 
 # Generate confusion matrix
-cm = confusion_matrix(y_test, y_pred_classes)
+cm = confusion_matrix(y_test_classes, y_pred_classes)
 plt.figure(figsize=(10, 7))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
 plt.xlabel('Predicted Labels')
@@ -118,12 +128,22 @@ plt.savefig(confusion_plot)
 #plt.show()
 
 
+# Additional evaluation metrics
+precision = precision_score(y_test_classes, y_pred_classes, average='macro')
+recall = recall_score(y_test_classes, y_pred_classes, average='macro')
+f1 = f1_score(y_test_classes, y_pred_classes, average='macro')
+print(f'Precision: {precision}')
+print(f'Recall: {recall}')
+print(f'F1 Score: {f1}')
+
 # Plot training history
+plt.figure()
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label='val_accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.ylim([0, 1])
+plt.title('Training History')
 plt.savefig(training_history)
 plt.legend(loc='lower right')
 #plt.show()  
