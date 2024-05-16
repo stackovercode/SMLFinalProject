@@ -18,17 +18,22 @@ if not os.path.exists(plot_dir):
 # Define file paths for saving plots
 missing_values_before_path = os.path.join(plot_dir, 'missing_values_before.png')
 missing_values_after_path = os.path.join(plot_dir, 'missing_values_after.png')
+missing_values_rows_path = os.path.join(plot_dir, 'missing_values_rows.png')
 original_data_before_norm_path = os.path.join(plot_dir, 'original_data_before_norm.png')
 standardized_data_after_norm_path = os.path.join(plot_dir, 'standardized_data_after_norm.png')
 explained_variance_path = os.path.join(plot_dir, 'explained_variance.png')
 pca_projection_path = os.path.join(plot_dir, 'pca_projection.png')
 
-# Load dataset
-df = pd.read_csv(data_path, header=None)
+# Load dataset and skip the first row
+df = pd.read_csv(data_path, header=None, skiprows=1)
 
 # Assign column names
 col_names = ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'class']
 df.columns = col_names
+
+# Inspect the data for non-numeric values
+print(df.head())
+print(df.dtypes)
 
 # Convert numerical columns to float and handle errors
 for col in col_names[:-1]:
@@ -37,25 +42,36 @@ for col in col_names[:-1]:
 # Encode target class as categorical integer labels
 df['class'] = pd.Categorical(df['class']).codes
 
-# Plot original data (before handling missing values)
-plt.figure(figsize=(12, 6))
-sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
-plt.title('Missing Values in Dataset')
+# Sample the data to reduce size for quicker processing (5% subset)
+df_sample = df.sample(frac=0.05, random_state=42)
+
+# Plot original data (before handling missing values) on the sampled data
+plt.figure(figsize=(20, 10))
+sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+plt.title('Missing Values in Sampled Dataset')
 plt.savefig(missing_values_before_path)
-#plt.show()
+# plt.show()
 
-# Handle missing data
-df.dropna(inplace=True)
+# Save rows with missing values for further analysis
+df_missing = df_sample[df_sample.isnull().any(axis=1)]
 
-# Plot data after handling missing values
-plt.figure(figsize=(12, 6))
-sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
-plt.title('After Handling Missing Values')
+if not df_missing.empty:
+    # Plot rows with missing values from the sampled data
+    plt.figure(figsize=(20, 10))
+    sns.heatmap(df_missing.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+    plt.title('Rows with Missing Values in Sampled Data')
+    plt.savefig(missing_values_rows_path)
+    # plt.show()
+
+# Handle missing data by removing rows with any NaN values in the sampled data
+df_sample.dropna(inplace=True)
+
+# Plot data after handling missing values in the sampled data
+plt.figure(figsize=(20, 10))
+sns.heatmap(df_sample.isnull(), cbar=False, cmap='viridis', yticklabels=True)
+plt.title('After Handling Missing Values in Sampled Data')
 plt.savefig(missing_values_after_path)
-#plt.show()
-
-# Sample the data to reduce size for quicker processing
-df_sample = df.sample(frac=0.1, random_state=42)
+# plt.show()
 
 # Split dataset into features and target variable
 X = df_sample.drop('class', axis=1).values
@@ -71,7 +87,7 @@ plt.title('Original Data Before Normalization')
 plt.xlabel('Features')
 plt.ylabel('Value')
 plt.savefig(original_data_before_norm_path)
-#plt.show()
+# plt.show()
 
 # Standardize the data
 scaler = StandardScaler()
@@ -88,7 +104,7 @@ plt.title('Standardized Data After Normalization')
 plt.xlabel('Features')
 plt.ylabel('Standardized Value')
 plt.savefig(standardized_data_after_norm_path)
-#plt.show()
+# plt.show()
 
 # Apply PCA
 pca = PCA(n_components=10)
@@ -102,7 +118,7 @@ plt.xlabel('Number of Components')
 plt.ylabel('Cumulative Explained Variance')
 plt.title('Explained Variance by PCA Components')
 plt.savefig(explained_variance_path)
-#plt.show()
+# plt.show()
 
 # Plot first two principal components
 plt.figure(figsize=(8, 6))
@@ -112,4 +128,4 @@ plt.ylabel('Second Principal Component')
 plt.title('PCA - First Two Principal Components')
 plt.colorbar()
 plt.savefig(pca_projection_path)
-#plt.show()
+# plt.show()
