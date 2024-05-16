@@ -6,7 +6,7 @@ import numpy as np
 import os
 
 from sklearn.preprocessing import StandardScaler, label_binarize
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_score, recall_score, f1_score, mean_squared_error, mean_absolute_error
 from numpy import interp  
 from itertools import cycle
@@ -126,6 +126,7 @@ plt.show()  # Display the figure
 # Evaluate the model on the test set
 test_loss, test_acc = model.evaluate(X_test, y_test)
 print('Test accuracy:', test_acc)
+
 
 # Predict classes
 y_pred_classes = np.argmax(y_pred_proba, axis=1)

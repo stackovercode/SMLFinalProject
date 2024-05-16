@@ -74,12 +74,12 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accur
 model.summary()
 
 # Train the model with more epochs and save the best model
-checkpoint = tf.keras.callbacks.ModelCheckpoint('best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
+checkpoint = tf.keras.callbacks.ModelCheckpoint('CNN_LSTM_best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
 early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 history = model.fit(X_train, y_train, epochs=50, validation_split=0.2, callbacks=[checkpoint, early_stopping])
 
 # Load the best model
-model.load_weights('best_model.keras')
+model.load_weights('CNN_LSTM_best_model.keras')
 
 # Predict probabilities on the test set
 y_pred_proba = model.predict(X_test)
