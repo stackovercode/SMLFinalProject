@@ -10,7 +10,7 @@ from sklearn.model_selection import learning_curve
 
 
 # Load dataset with dtype specification and error handling
-data = '4_Classification of Robots from their conversation sequence_Set2.csv'
+data = './4_Classification of Robots from their conversation sequence_Set2.csv'
 data_types = {i: float for i in range(10)}  # Columns 0-9 as floats
 data_types[10] = 'category'  # Column 10 as category
 
@@ -37,7 +37,7 @@ df['class'] = pd.Categorical(df['class']).codes  # Convert to categorical codes 
 df.dropna(inplace=True)
 
 # Sample the data to reduce size for quicker processing
-df_sample = df.sample(frac=0.005, random_state=42)
+df_sample = df.sample(frac=0.01, random_state=42)
 
 # Split dataset into features and target variable
 X = df_sample.drop('class', axis=1)
@@ -68,7 +68,7 @@ plt.ylabel('Features')
 plt.title("Visualizing Important Features")
 plt.show()
 
-train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(), X, y, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1.0, 50))
+train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(), X, y, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1.0, 5))
 
 # Calculate training and test mean and std
 train_mean = np.mean(train_scores, axis=1)
