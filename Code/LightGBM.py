@@ -8,10 +8,11 @@ from sklearn.preprocessing import label_binarize
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+import gc
 
 # Load dataset
-data_path = './4_Classification of Robots from their conversation sequence_Set2.csv'
-df = pd.read_csv(data_path, header=None, dtype={i: 'str' for i in range(11)})
+data_path = './cleaned_robot_data.csv'
+df = pd.read_csv(data_path, header=0, dtype={i: 'str' for i in range(11)})
 
 # Assign column names
 col_names = ['num1', 'num2', 'num3', 'num4', 'num5', 'num6', 'num7', 'num8', 'num9', 'num10', 'class']
@@ -21,13 +22,15 @@ df.columns = col_names
 df[col_names[:-1]] = df[col_names[:-1]].apply(pd.to_numeric, errors='coerce')
 df.dropna(inplace=True)
 
-# Convert class to categorical integer labels and reset indexes
+# Convert class to categorical integer labels
 df['class'] = pd.Categorical(df['class']).codes
-X = df.drop('class', axis=1).reset_index(drop=True)
-y = df['class'].reset_index(drop=True)
 
-# Verify that labels are in the correct range
-assert y.min() >= 0 and y.max() < len(np.unique(y)), "Labels are not in the correct range"
+# Sample the data to reduce size for quicker processing
+df_sample = df.sample(frac=0.01, random_state=42)  # Adjust sample size as needed
+
+# Split dataset into features and target variable and reset indexes
+X = df_sample.drop('class', axis=1).reset_index(drop=True)
+y = df_sample['class'].reset_index(drop=True)
 
 # Define directory for saving plots
 plot_dir = './TestingPlots/lightgbm'
@@ -67,7 +70,7 @@ for train_index, test_index in skf.split(X, y):
         'max_depth': -1,
         'min_data_in_leaf': 20,
         'verbose': -1,
-        'device': 'cpu',  # Use CPU since GPU is not enabled
+        'device': 'gpu',
     }
 
     # Train the model (using callbacks for early stopping)
@@ -116,6 +119,10 @@ for train_index, test_index in skf.split(X, y):
     all_fpr.append(fpr)
     all_tpr.append(tpr)
     all_roc_auc.append(roc_auc)
+
+    # Clean up memory
+    del X_train, X_test, y_train, y_test, d_train, d_test, model
+    gc.collect()
 
 # Plot ROC curve for each class
 plt.figure(figsize=(10, 7))
