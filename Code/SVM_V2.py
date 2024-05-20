@@ -4,17 +4,19 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, GridSearchCV, learning_curve
 from sklearn.preprocessing import StandardScaler, label_binarize
+from sklearn.calibration import calibration_curve
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc, precision_score, recall_score, f1_score, precision_recall_curve, average_precision_score, calibration_curve
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc, precision_score, recall_score, f1_score, precision_recall_curve, average_precision_score
 import os
-from imblearn.over_sampling import SMOTE
+from sklearn.decomposition import PCA
+from tqdm import tqdm  # Add this import for the progress bar
 
 # Load dataset with dtype specification and error handling
 data = './4_Classification of Robots from their conversation sequence_Set2.csv'
-df = pd.read_csv(data, header=0)
+df = pd.read_csv(data, header=0, on_bad_lines='skip')
 
 # Define directory for saving plots
-plot_dir = './svm'
+plot_dir = './svm2'
 os.makedirs(plot_dir, exist_ok=True)
 
 ROC_plot = os.path.join(plot_dir, 'ROC_plot.png')
@@ -42,7 +44,7 @@ df['class'] = pd.Categorical(df['class']).codes  # Convert to categorical codes 
 df.dropna(inplace=True)
 
 # Sample the data to reduce size for quicker processing
-df_sample = df.sample(frac=0.03, random_state=42)
+df_sample = df.sample(frac=0.05, random_state=42)
 
 # Remove classes with less than 2 samples
 class_counts = df_sample['class'].value_counts()
@@ -53,20 +55,29 @@ X = df_sample.drop('class', axis=1).values
 y = df_sample['class'].values
 
 # Apply SMOTE to handle imbalanced classes
-smote = SMOTE(random_state=42, k_neighbors=1)
-X_res, y_res = smote.fit_resample(X, y)
+#smote = SMOTE(random_state=42, k_neighbors=1)
+#X_res, y_res = smote.fit_resample(X, y)
 
 # Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.33, random_state=42, stratify=y_res)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42, stratify=y)
 
 # Standardize the data for SVM
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Train SVM
+# Optionally apply PCA
+use_pca = False  # Set to False to disable PCA
+if use_pca:
+    pca = PCA(n_components=4)  # Adjust the number of components as needed
+    X_train_scaled = pca.fit_transform(X_train_scaled)
+    X_test_scaled = pca.transform(X_test_scaled)
+
+# Train SVM with progress bar
 svm = SVC(kernel='rbf', C=1, gamma='scale', probability=True)  # Use probability=True for ROC curve
-svm.fit(X_train_scaled, y_train)
+print("Training SVM...")
+for i in tqdm(range(1, 2)):  # Modify this loop if you need to iterate multiple times
+    svm.fit(X_train_scaled, y_train)
 
 # Evaluate SVM
 y_pred_svm = svm.predict(X_test_scaled)
@@ -95,7 +106,7 @@ roc_auc = dict()
 y_score = svm.predict_proba(X_test_scaled)
 
 # Safely calculate ROC curves
-for i in range(n_classes):
+for i in tqdm(range(n_classes)):
     if np.sum(y_test_binarized[:, i]) > 0:
         fpr[i], tpr[i], _ = roc_curve(y_test_binarized[:, i], y_score[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
@@ -217,13 +228,12 @@ plt.savefig(calibration_curve_plot)
 plt.show()
 
 # Feature Importance for SVM using PCA components (as SVM does not provide feature importances directly)
-from sklearn.decomposition import PCA
 
 # Select features for PCA
-pca_features = ['num7', 'num8', 'num9', 'num10']
+pca_features = ['num9', 'num10']
 
 # Apply PCA on the selected features
-pca = PCA(n_components=4)
+pca = PCA(n_components=2)
 X_train_pca = pca.fit_transform(X_train_scaled)
 X_test_pca = pca.transform(X_test_scaled)
 
@@ -232,7 +242,7 @@ svm_pca = SVC(kernel='rbf', C=1, gamma='scale', probability=True)
 svm_pca.fit(X_train_pca, y_train)
 
 # Get feature importances from PCA components
-feature_scores = pd.Series(pca.explained_variance_ratio_, index=['PC1', 'PC2', 'PC3', 'PC4']).sort_values(ascending=False)
+feature_scores = pd.Series(pca.explained_variance_ratio_, index=['PC1', 'PC2']).sort_values(ascending=False)
 
 # Plot feature importances
 plt.figure(figsize=(10, 8))
