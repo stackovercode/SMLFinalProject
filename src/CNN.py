@@ -1,15 +1,18 @@
+from sklearn.discriminant_analysis import StandardScaler
 import tensorflow as tf
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-import os
-from itertools import cycle
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Dropout, Input # type: ignore
 from sklearn.preprocessing import label_binarize
 from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+from itertools import cycle
 
-class NeuralNetwork:
+class CNN:
     def __init__(self, data_path, processed_data_path, plot_dir='./plot/NN'):
         self.data_path = data_path
         self.processed_data_path = processed_data_path
@@ -32,27 +35,35 @@ class NeuralNetwork:
         y_bin = label_binarize(y, classes=np.unique(y))
         self.n_classes = y_bin.shape[1]
 
+        # Normalize the features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        # Reshape for CNN input (samples, time steps, features)
+        X_scaled = X_scaled.reshape((X_scaled.shape[0], X_scaled.shape[1], 1))
+
         # Split the data into training and testing sets
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y_bin, test_size=0.3, random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X_scaled, y_bin, test_size=0.3, random_state=42)
 
     def build_model(self):
-        self.model = tf.keras.Sequential([
-            tf.keras.layers.Dense(128, activation='relu', input_shape=(self.X_train.shape[1],)),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(self.n_classes, activation='softmax')
+        self.model = Sequential([
+            Input(shape=(self.X_train.shape[1], self.X_train.shape[2])),
+            Conv1D(32, kernel_size=3, activation='relu'),
+            MaxPooling1D(pool_size=2),
+            LSTM(64, activation='relu'),
+            Dropout(0.2),
+            Dense(self.n_classes, activation='softmax')
         ])
         self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         self.model.summary()
 
     def train_model(self, epochs=50):
-        checkpoint = tf.keras.callbacks.ModelCheckpoint('NN_best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
+        checkpoint = tf.keras.callbacks.ModelCheckpoint('CNN_LSTM_best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
         early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
         self.history = self.model.fit(self.X_train, self.y_train, epochs=epochs, validation_split=0.2, callbacks=[checkpoint, early_stopping])
 
         # Load the best model
-        self.model.load_weights('NN_best_model.keras')
-
+        self.model.load_weights('CNN_LSTM_best_model.keras')
 
     def evaluate_model(self):
         # Predict probabilities on the test set
@@ -79,7 +90,7 @@ class NeuralNetwork:
         colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive'])
         for i, color in zip(range(self.n_classes), colors):
             plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                    label='ROC curve of class {0} (area = {1:0.2f})'.format(i, roc_auc[i]))
+                     label='ROC curve of class {0} (area = {1:0.2f})'.format(i, roc_auc[i]))
 
         plt.plot([0, 1], [0, 1], 'k--', lw=2)
         plt.plot(all_fpr, mean_tpr, color='navy', linestyle='-', lw=2, label='Mean ROC (area = %0.2f)' % auc(all_fpr, mean_tpr))
@@ -99,7 +110,7 @@ class NeuralNetwork:
         plt.show()
 
         # Evaluate the model on the test set
-        test_loss, test_acc = self.model.evaluate(self.X_test, self.y_test)  # Pass both features and labels
+        test_loss, test_acc = self.model.evaluate(self.X_test, self.y_test)
         print('Test accuracy:', test_acc)
 
         # Predict classes
