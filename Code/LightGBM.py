@@ -11,7 +11,7 @@ import os
 import gc
 
 # Load dataset
-data_path = './cleaned_robot_data.csv'
+data_path = './4_Classification of Robots from their conversation sequence_Set2.csv'
 df = pd.read_csv(data_path, header=0, dtype={i: 'str' for i in range(11)})
 
 # Assign column names
