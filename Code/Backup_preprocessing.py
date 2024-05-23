@@ -74,7 +74,7 @@ class Preprocessing:
 
         df.replace([np.inf, -np.inf], np.nan, inplace=True)
         print("Infinity values replaced with NaN")
-        #self.plot_missing_values(df, "Data with NaNs Replaced")
+        self.plot_missing_values(df, "Data with NaNs Replaced")
 
         df['source'] = pd.Categorical(df['source']).codes
         print("Target class encoded")
@@ -89,7 +89,7 @@ class Preprocessing:
 
         df_sample.dropna(inplace=True)
         print("Missing values handled")
-        #self.plot_missing_values(df_sample, "Data after Handling Missing Values")
+        self.plot_missing_values(df_sample, "Data after Handling Missing Values")
 
         df_sample.drop_duplicates(inplace=True)
         print("Duplicate rows removed")
@@ -148,4 +148,5 @@ class Preprocessing:
 
     def save_cleaned_data(self):
         self.df_sample.to_csv(self.processed_data_path, index=False)
+
 

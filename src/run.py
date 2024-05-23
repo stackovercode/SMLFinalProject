@@ -4,15 +4,13 @@ from CNN import CNN
 from ensemble import EnsembleModel
 
 def main():
-    
-    
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
     default_sample_size = 0.1
     skip_preprocessing = False
     skip_NN = False
     skip_Ensemple = True
-    Test_CNN = True
+    Test_CNN = False
     
     if skip_preprocessing:
         print("\nData has already been preprocessed. Skipping preprocessing step.")
@@ -37,6 +35,9 @@ def main():
             preprocessor.examine_robot_data(robot_id, i + 1, total_robots)
 
         preprocessor.plot_correlation_heatmap(preprocessor.df_sample.drop('source', axis=1))
+        
+        # Apply PCA during preprocessing
+        X_train, X_test, y_train, y_test, explained_variance_ratio = preprocessor.preprocess_data(apply_pca=True)
         print("\nData Preprocessing Complete.")
     
     if skip_NN:
@@ -44,8 +45,8 @@ def main():
     elif Test_CNN != True:
         print("\nNeural Network training being processed...")
         # Neural Network training and evaluation
-        nn = NeuralNetwork(data_path, processed_data_path)
-        nn.load_and_preprocess_data()
+        nn = NeuralNetwork()
+        nn.load_data(X_train, X_test, y_train, y_test)
         nn.build_model()
         nn.train_model()
         nn.evaluate_model()
