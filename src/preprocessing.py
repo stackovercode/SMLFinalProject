@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.decomposition import PCA
 import warnings
 import matplotlib.pyplot as plt
@@ -97,14 +97,14 @@ class Preprocessing:
 
         self.df_sample = df_sample
 
-    def preprocess_data(self, apply_pca=False, n_components=10):
+    def preprocess_data(self, apply_pca=False, n_components=10, degree=2):
         df = self.df_sample
         X = df.drop('source', axis=1).values
         y = df['source'].values
         print("Data split into features and target variable")
         self.plot_feature_distribution(X, "Feature Distribution Before Split")
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42, stratify=y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y) # 90% training, 10% testing
         print("Data split into training and testing sets")
         self.plot_feature_distribution(X_train, "Training Set Feature Distribution")
         self.plot_feature_distribution(X_test, "Testing Set Feature Distribution")
@@ -115,18 +115,27 @@ class Preprocessing:
         print("Data standardized")
         self.plot_feature_distribution(X_train_scaled, "Standardized Training Set Feature Distribution")
         self.plot_feature_distribution(X_test_scaled, "Standardized Testing Set Feature Distribution")
+        
+        # Add polynomial features
+        poly = PolynomialFeatures(degree=degree, interaction_only=True, include_bias=False)
+        X_train_poly = poly.fit_transform(X_train_scaled)
+        X_test_poly = poly.transform(X_test_scaled)
+        print(f"Polynomial features (degree={degree}) added")
+        self.plot_feature_distribution(X_train_poly, "Polynomial Features Training Set Distribution")
+        self.plot_feature_distribution(X_test_poly, "Polynomial Features Testing Set Distribution")
+
 
         if apply_pca:
             pca = PCA(n_components=n_components)
-            X_train_pca = pca.fit_transform(X_train_scaled)
-            X_test_pca = pca.transform(X_test_scaled)
+            X_train_pca = pca.fit_transform(X_train_poly)
+            X_test_pca = pca.transform(X_test_poly)
             print("PCA applied")
             self.plot_pca_variance(pca, "PCA Explained Variance")
             self.plot_feature_distribution(X_train_pca, "PCA Transformed Training Set Feature Distribution")
             self.plot_feature_distribution(X_test_pca, "PCA Transformed Testing Set Feature Distribution")
             return X_train_pca, X_test_pca, y_train, y_test, pca.explained_variance_ratio_
 
-        return X_train_scaled, X_test_scaled, y_train, y_test
+        return X_train_poly, X_test_poly, y_train, y_test
 
     def examine_robot_data(self, robot_id, progress, total):
         plot_dir = './plot/preprocessing'

@@ -192,49 +192,49 @@
 #############################################    NEW METHODS     ###########################################
 ############################################################################################################
 
-# from sklearn.preprocessing import PolynomialFeatures
-# from sklearn.ensemble import GradientBoostingClassifier
-# from sklearn.metrics import accuracy_score, classification_report
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import StandardScaler
-# from imblearn.over_sampling import SMOTE
-# import pandas as pd
-# import os
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import SMOTE
+import pandas as pd
+import os
 
-# # Set the number of threads for sklearn to use
-# os.environ["OMP_NUM_THREADS"] = "1"  # or any number of threads you want to use
+# Set the number of threads for sklearn to use
+os.environ["OMP_NUM_THREADS"] = "1"  # or any number of threads you want to use
 
-# # Load and preprocess the dataset
-# file_path = './data/cleaned_robot_data.csv'
-# robot_data = pd.read_csv(file_path)
-# X = robot_data.drop(columns=['source'])
-# y = robot_data['source']
+# Load and preprocess the dataset
+file_path = './data/cleaned_robot_data.csv'
+robot_data = pd.read_csv(file_path)
+X = robot_data.drop(columns=['source'])
+y = robot_data['source']
 
-# scaler = StandardScaler()
-# X_scaled = scaler.fit_transform(X)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-# # Create polynomial features and interaction terms
-# poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
-# X_poly = poly.fit_transform(X_scaled)
+# Create polynomial features and interaction terms
+poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
+X_poly = poly.fit_transform(X_scaled)
 
-# # Split the data
-# X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
 
-# # Apply SMOTE to the training data
-# smote = SMOTE(random_state=42)
-# X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
+# Apply SMOTE to the training data
+smote = SMOTE(random_state=42)
+X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
 
-# # Train the Gradient Boosting model
-# gb = GradientBoostingClassifier(n_estimators=200, learning_rate=0.1, max_depth=3, random_state=42)
-# gb.fit(X_train_smote, y_train_smote)
+# Train the Gradient Boosting model
+gb = GradientBoostingClassifier(n_estimators=200, learning_rate=0.1, max_depth=3, random_state=42)
+gb.fit(X_train_smote, y_train_smote)
 
-# # Predict and evaluate
-# y_pred_gb = gb.predict(X_test)
-# accuracy_gb = accuracy_score(y_test, y_pred_gb)
-# report_gb = classification_report(y_test, y_pred_gb)
+# Predict and evaluate
+y_pred_gb = gb.predict(X_test)
+accuracy_gb = accuracy_score(y_test, y_pred_gb)
+report_gb = classification_report(y_test, y_pred_gb)
 
-# print("Gradient Boosting Model Accuracy with Feature Engineering after SMOTE:", accuracy_gb)
-# print("Gradient Boosting Classification Report with Feature Engineering after SMOTE:\n", report_gb)
+print("Gradient Boosting Model Accuracy with Feature Engineering after SMOTE:", accuracy_gb)
+print("Gradient Boosting Classification Report with Feature Engineering after SMOTE:\n", report_gb)
 
 ############################################################################################################
 #############################################    NEW METHODS     ###########################################
@@ -942,44 +942,44 @@
 #############################################    NEW METHODS     ###########################################
 ############################################################################################################
 
-from imblearn.ensemble import EasyEnsembleClassifier
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-import pandas as pd
+# from imblearn.ensemble import EasyEnsembleClassifier
+# from sklearn.metrics import accuracy_score, classification_report
+# from sklearn.model_selection import train_test_split
+# from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+# import pandas as pd
 
-# Load and preprocess the dataset
-file_path = './data/cleaned_robot_data.csv'
-robot_data = pd.read_csv(file_path)
-X = robot_data.drop(columns=['source'])
-y = robot_data['source']
+# # Load and preprocess the dataset
+# file_path = './data/cleaned_robot_data.csv'
+# robot_data = pd.read_csv(file_path)
+# X = robot_data.drop(columns=['source'])
+# y = robot_data['source']
 
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+# scaler = StandardScaler()
+# X_scaled = scaler.fit_transform(X)
 
-# Create polynomial features and interaction terms
-poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
-X_poly = poly.fit_transform(X_scaled)
+# # Create polynomial features and interaction terms
+# poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
+# X_poly = poly.fit_transform(X_scaled)
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
+# # Split the data
+# X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
 
-# Train the EasyEnsembleClassifier model
-easy_ensemble = EasyEnsembleClassifier(random_state=42, n_estimators=10)
-easy_ensemble.fit(X_train, y_train)
+# # Train the EasyEnsembleClassifier model
+# easy_ensemble = EasyEnsembleClassifier(random_state=42, n_estimators=10)
+# easy_ensemble.fit(X_train, y_train)
 
-# Predict and evaluate
-y_pred_easy_ensemble = easy_ensemble.predict(X_test)
-accuracy_easy_ensemble = accuracy_score(y_test, y_pred_easy_ensemble)
-report_easy_ensemble = classification_report(y_test, y_pred_easy_ensemble)
+# # Predict and evaluate
+# y_pred_easy_ensemble = easy_ensemble.predict(X_test)
+# accuracy_easy_ensemble = accuracy_score(y_test, y_pred_easy_ensemble)
+# report_easy_ensemble = classification_report(y_test, y_pred_easy_ensemble)
 
-print("EasyEnsembleClassifier Model Accuracy:", accuracy_easy_ensemble)
-print("EasyEnsembleClassifier Classification Report:\n", report_easy_ensemble)
+# print("EasyEnsembleClassifier Model Accuracy:", accuracy_easy_ensemble)
+# print("EasyEnsembleClassifier Classification Report:\n", report_easy_ensemble)
 
-# import numpy as np
-# from sklearn.ensemble import RandomForestClassifier
-# from imblearn.over_sampling import SMOTE
+# # import numpy as np
+# # from sklearn.ensemble import RandomForestClassifier
+# # from imblearn.over_sampling import SMOTE
 
-# print(f"Numpy version: {np.__version__}")
-# print(f"Scikit-learn version: {RandomForestClassifier.__module__.split('.')[0]} version {RandomForestClassifier.__version__}")
-# print(f"Imbalanced-learn version: {SMOTE.__module__.split('.')[0]} version {SMOTE.__version__}")
+# # print(f"Numpy version: {np.__version__}")
+# # print(f"Scikit-learn version: {RandomForestClassifier.__module__.split('.')[0]} version {RandomForestClassifier.__version__}")
+# # print(f"Imbalanced-learn version: {SMOTE.__module__.split('.')[0]} version {SMOTE.__version__}")

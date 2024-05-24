@@ -2,12 +2,16 @@ from preprocessing import Preprocessing
 from NN import NeuralNetwork
 from CNN import CNN
 from ensemble import EnsembleModel
+from GB import GradientBoosting
+from compare import ModelComparison
 
 def main():
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
-    default_sample_size = 0.1
+    #default_sample_size = 0.1
+    default_sample_size = 0.4
     skip_preprocessing = False
+    skip_gb = False
     skip_NN = False
     skip_Ensemple = True
     Test_CNN = False
@@ -63,6 +67,19 @@ def main():
         cnn.evaluate_model()
         cnn.plot_training_history()
         print("\nCNN model complete.")
+        
+    if skip_gb:
+        print("\nGradient Boosting training skipped.")
+    else:
+        print("\nGradient Boosting training being processed...")
+        # Gradient Boosting training and evaluation
+        gb = GradientBoosting()
+        gb.load_data(X_train, X_test, y_train, y_test)
+        gb.build_model()
+        gb.train_model()
+        gb.evaluate_model()
+        print("\nGradient Boosting model complete.")
+
 
     if skip_Ensemple:
         print("\nEnsemble model training skipped.")
@@ -72,6 +89,11 @@ def main():
         ensemble = EnsembleModel(data_path, processed_data_path)
         ensemble.train_and_evaluate()
         print("\Ensemble model complete.")  
+        
+    # Run comparison after both models are trained and evaluated
+    comparator = ModelComparison()
+    comparator.run_comparison()
+    print("\nComparison of models complete.")
         
     print("\nData preprocessing and model training complete.")   
 

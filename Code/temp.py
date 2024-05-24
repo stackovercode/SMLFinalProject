@@ -1,89 +1,120 @@
-import os
-import sys
+import tensorflow as tf
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-import warnings
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+import os
+from itertools import cycle
+from sklearn.preprocessing import label_binarize
+from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_score, recall_score, f1_score
+import json
 
-warnings.filterwarnings("ignore", category=FutureWarning, message=".*use_inf_as_na.*")
+class NeuralNetwork:
+    def __init__(self, plot_dir='./plot/NN'):
+        self.plot_dir = plot_dir
+        os.makedirs(self.plot_dir, exist_ok=True)
+        self.model = None
+        print("Available devices:")
+        print(tf.config.list_physical_devices())
 
-class Preprocessing:
-    def __init__(self, data_path, processed_data_path, default_sample_size=0.33):
-        self.data_path = data_path
-        self.processed_data_path = processed_data_path
-        self.default_sample_size = default_sample_size
-        self.df_sample = None
-
-    @staticmethod
-    def show_progress(label, full, prog):
-        sys.stdout.write("\r{0}: {1}%  [{2}{3}]".format(label, prog, "█" * full, " " * (30 - full)))
-        sys.stdout.flush()
-
-    def load_data(self, sample_fracs, random_state=42):
-        df = pd.read_csv(self.data_path, header=0)
-        print("Data loaded successfully")
+    def load_data(self, X_train, X_test, y_train, y_test):
+        # Binarize the labels for multi-class classification
+        y_train_bin = label_binarize(y_train, classes=np.unique(y_train))
+        y_test_bin = label_binarize(y_test, classes=np.unique(y_test))
+        self.n_classes = y_train_bin.shape[1]
         
-        for col in df.columns[1:]:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-        print("Numerical columns converted to float")
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train_bin
+        self.y_test = y_test_bin
 
-        df.replace([np.inf, -np.inf], np.nan, inplace=True)
-        print("Infinity values replaced with NaN")
-
-        df['source'] = pd.Categorical(df['source']).codes
-        print("Target class encoded")
-
-        df = df.sample(frac=1, random_state=random_state)
-        df_sample = pd.concat([
-            df[df['source'] == robot_id].sample(frac=sample_fracs[robot_id], random_state=random_state)
-            for robot_id in sample_fracs
+    def build_model(self):
+        self.model = tf.keras.Sequential([
+            tf.keras.layers.Dense(128, activation='relu', input_shape=(self.X_train.shape[1],)),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(64, activation='relu'),
+            tf.keras.layers.Dense(self.n_classes, activation='softmax')
         ])
-        print("Data shuffled and stratified sampled")
+        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.model.summary()
 
-        df_sample.dropna(inplace=True)
-        print("Missing values handled")
+    def train_model(self, epochs=50):
+        checkpoint = tf.keras.callbacks.ModelCheckpoint('NN_best_model.keras', monitor='val_accuracy', save_best_only=True, mode='max')
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+        self.history = self.model.fit(self.X_train, self.y_train, epochs=epochs, validation_split=0.2, callbacks=[checkpoint, early_stopping])
+        # Load the best model
+        self.model.load_weights('NN_best_model.keras')
 
-        df_sample.drop_duplicates(inplace=True)
-        print("Duplicate rows removed")
+    def evaluate_model(self):
+        # Predict probabilities on the test set
+        y_pred_proba = self.model.predict(self.X_test)
+        # Compute ROC curve and ROC area for each class
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        all_fpr = np.unique(np.concatenate([roc_curve(self.y_test[:, i], y_pred_proba[:, i])[0] for i in range(self.n_classes)]))
+        # Interpolate all ROC curves at these points
+        mean_tpr = np.zeros_like(all_fpr)
+        for i in range(self.n_classes):
+            fpr[i], tpr[i], _ = roc_curve(self.y_test[:, i], y_pred_proba[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+            mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+        # Finally average it and compute AUC
+        mean_tpr /= self.n_classes
 
-        self.df_sample = df_sample
-
-    def preprocess_data(self, apply_pca=False, n_components=10):
-        robot_data_dict = {}
-        for robot_id in range(5):
-            robot_data = self.df_sample[self.df_sample['source'] == robot_id]
-            
-            # Compute statistical features
-            robot_data['mean'] = robot_data.mean(axis=1)
-            robot_data['std'] = robot_data.std(axis=1)
-            
-            X = robot_data.drop('source', axis=1).values
-            y = robot_data['source'].values
-            
-            print(f"Data split into features and target variable for robot {robot_id}")
-
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42, stratify=y)
-            print(f"Data split into training and testing sets for robot {robot_id}")
-
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-            print(f"Data standardized for robot {robot_id}")
-
-            if apply_pca:
-                pca = PCA(n_components=n_components)
-                X_train_pca = pca.fit_transform(X_train_scaled)
-                X_test_pca = pca.transform(X_test_scaled)
-                print(f"PCA applied for robot {robot_id}")
-                robot_data_dict[robot_id] = (X_train_pca, X_test_pca, y_train, y_test)
-            else:
-                robot_data_dict[robot_id] = (X_train_scaled, X_test_scaled, y_train, y_test)
+        # Save ROC data
+        roc_data = {
+            'fpr': {str(i): fpr[i].tolist() for i in fpr},
+            'tpr': {str(i): tpr[i].tolist() for i in tpr},
+            'roc_auc': {str(i): roc_auc[i] for i in roc_auc},
+            'all_fpr': all_fpr.tolist(),
+            'mean_tpr': mean_tpr.tolist()
+        }
+        with open(os.path.join(self.plot_dir, 'roc_data_nn.json'), 'w') as f:
+            json.dump(roc_data, f)
         
-        return robot_data_dict
+        # Evaluate the model on the test set
+        test_loss, test_acc = self.model.evaluate(self.X_test, self.y_test)  # Pass both features and labels
+        print('Test accuracy:', test_acc)
+        # Predict classes
+        y_pred_classes = np.argmax(y_pred_proba, axis=1)
+        y_test_classes = np.argmax(self.y_test, axis=1)
+        
+        # Generate confusion matrix
+        cm = confusion_matrix(y_test_classes, y_pred_classes)
+        plt.figure(figsize=(10, 7))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+        plt.xlabel('Predicted Labels')
+        plt.ylabel('True Labels')
+        plt.title('Confusion Matrix')
+        plt.savefig(os.path.join(self.plot_dir, 'confusion_plot.png'))
+        #plt.show()
 
-    def save_cleaned_data(self):
-        self.df_sample.to_csv(self.processed_data_path, index=False)
+        # Save metrics
+        precision = precision_score(y_test_classes, y_pred_classes, average='macro', zero_division=0)
+        recall = recall_score(y_test_classes, y_pred_classes, average='macro', zero_division=0)
+        f1 = f1_score(y_test_classes, y_pred_classes, average='macro', zero_division=0)
+        metrics = {
+            'accuracy': test_acc,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1
+        }
+        with open(os.path.join(self.plot_dir, 'metrics_nn.json'), 'w') as f:
+            json.dump(metrics, f)
+
+        print(f'Precision: {precision}')
+        print(f'Recall: {recall}')
+        print(f'F1 Score: {f1}')
+
+    def plot_training_history(self):
+        plt.figure()
+        plt.plot(self.history.history['accuracy'], label='accuracy')
+        plt.plot(self.history.history['val_accuracy'], label='val_accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.ylim([0, 1])
+        plt.title('Training History')
+        plt.legend(loc='lower right')
+        plt.savefig(os.path.join(self.plot_dir, 'training_history.png'))
+        #plt.show()
