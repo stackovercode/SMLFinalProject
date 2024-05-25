@@ -9,7 +9,7 @@ def main():
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
     #default_sample_size = 0.1
-    default_sample_size = 0.4
+    default_sample_size = 0.5
     skip_preprocessing = False
     skip_gb = False
     skip_NN = False
