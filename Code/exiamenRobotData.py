@@ -1,12 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+
 
 def load_and_preprocess_data(data_path):
     """Loads and cleans the dataset."""
-    df = pd.read_csv(data_path, header=None, dtype=str)
+    df = pd.read_csv(data_path, header=0, dtype=str)
     col_names = ['source'] + [f'num{i}' for i in range(1, 11)]
     df.columns = col_names
+    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    print("Infinity values replaced with NaN")
     df = df.iloc[1:].copy()
     df[df.columns[1:]] = df[df.columns[1:]].astype(float)
     df['source'] = df['source'].astype('category')
@@ -38,12 +42,6 @@ if __name__ == '__main__':
     
     # Load and preprocess data
     df = load_and_preprocess_data(data_path)
-    
-    # Examine data for Robot 0
-    examine_robot_data(df, '0')
-    
-    # Examine data for Robot 1
-    examine_robot_data(df, '1')
-    
+
     # Examine data for Robot 3
     examine_robot_data(df, '3')

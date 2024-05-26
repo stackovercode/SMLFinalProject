@@ -12,7 +12,7 @@ class ModelComparison:
         self.gb_dir = gb_dir
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
-        self.total_steps = 4  # Number of steps in the comparison process
+        self.total_steps = 5  # Number of steps in the comparison process
 
     @staticmethod
     def show_progress(label, phase, current, total):
@@ -55,7 +55,9 @@ class ModelComparison:
         plt.legend(loc="lower right", prop={'size': 10})
         plt.grid(alpha=0.4)
         plt.savefig(os.path.join(self.output_dir, 'ROC_curve_comparison.png'))
-        plt.show()
+        #plt.show()
+        plt.close()
+
 
     def compare_metrics(self):
         metrics_df = pd.DataFrame({

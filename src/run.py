@@ -8,13 +8,22 @@ from compare import ModelComparison
 def main():
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
-    #default_sample_size = 0.1
-    default_sample_size = 0.5
+    default_sample_size = 0.1
+    #default_sample_size = 0.2
     skip_preprocessing = False
     skip_gb = False
+    Test_NN_hyperparameter_tuning_NN = False
     skip_NN = False
     skip_Ensemple = True
     Test_CNN = False
+    
+    best_params_NN = {
+            'model__activation': 'relu',
+            'model__optimizer': 'adam',
+            'model__dropout_rate': 0.2,
+            'batch_size': 32,
+            'epochs': 100
+        }
     
     if skip_preprocessing:
         print("\nData has already been preprocessed. Skipping preprocessing step.")
@@ -48,10 +57,13 @@ def main():
         print("\nNeural Network training skipped.")
     elif Test_CNN != True:
         print("\nNeural Network training being processed...")
-        # Neural Network training and evaluation
         nn = NeuralNetwork()
         nn.load_data(X_train, X_test, y_train, y_test)
-        nn.build_model()
+        if Test_NN_hyperparameter_tuning_NN:
+            nn.hyperparameter_tuning()
+        else:
+            #nn.build_model(best_params_NN)
+            nn.set_params(best_params_NN)
         nn.train_model()
         nn.evaluate_model()
         nn.plot_training_history()

@@ -1,4 +1,4 @@
- from sklearn.discriminant_analysis import StandardScaler
+from sklearn.discriminant_analysis import StandardScaler
 import tensorflow as tf
 from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Dropout, Input # type: ignore
