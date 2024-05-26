@@ -1,177 +1,226 @@
-import os
-import sys
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from sklearn.decomposition import PCA
-import warnings
+import json
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc, confusion_matrix, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+import pandas as pd
+import os
+import sys
+from itertools import cycle, product
+from sklearn.model_selection import KFold
+import time
 
-warnings.filterwarnings("ignore", category=FutureWarning, message=".*use_inf_as_na.*")
-
-# Set global font size settings
-plt.rcParams.update({
-    'font.size': 14,      # Title font size
-    'axes.titlesize': 16, # Axis title font size
-    'axes.labelsize': 14, # Axis label font size
-    'xtick.labelsize': 12,# X-tick label font size
-    'ytick.labelsize': 12,# Y-tick label font size
-    'legend.fontsize': 14 # Legend font size
-})
-
-class Preprocessing:
-    def __init__(self, data_path, processed_data_path, default_sample_size=0.33):
-        self.data_path = data_path
-        self.processed_data_path = processed_data_path
-        self.default_sample_size = default_sample_size
-        self.df_sample = None
+class GradientBoosting:
+    def __init__(self, plot_dir='./plot/GB'):
+        self.plot_dir = plot_dir
+        os.makedirs(self.plot_dir, exist_ok=True)
+        self.model = None
+        self.best_params_ = None
 
     @staticmethod
-    def show_progress(label, full, prog):
-        sys.stdout.write("\r{0}: {1}%  [{2}{3}]".format(label, prog, "█" * full, " " * (30 - full)))
+    def show_progress(label, phase, current, total):
+        prog = int((current / total) * 100)
+        full = prog // 3
+        sys.stdout.write(f"\r{label} ({phase}): {prog}%  [{'█' * full}{' ' * (30 - full)}]")
         sys.stdout.flush()
 
-    @staticmethod
-    def plot_data_distribution(df, title):
-        plt.figure(figsize=(10, 6))
-        sns.countplot(x='source', data=df)
-        plt.title(title)
-        plt.savefig(f'./plot/preprocessing/{title.replace(" ", "_")}.png')
-        plt.close()
+    def load_data(self, X_train, X_test, y_train, y_test):
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
+        self.y_test = y_test
 
-    @staticmethod
-    def plot_missing_values(df, title):
-        plt.figure(figsize=(10, 6))
-        sns.heatmap(df.isnull(), cbar=False, cmap='viridis')
-        plt.title(title)
-        plt.savefig(f'./plot/preprocessing/{title.replace(" ", "_")}.png')
-        plt.close()
+    def hyperparameter_tuning(self):
+        param_grid = {
+            'n_estimators': [100, 200],
+            'learning_rate': [0.01, 0.1],
+            'max_depth': [3, 4],
+            'subsample': [0.8, 1.0],
+            'min_samples_split': [2, 5]
+        }
 
-    @staticmethod
-    def plot_feature_distribution(X, title):
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=X)
-        plt.title(title)
-        plt.savefig(f'./plot/preprocessing/{title.replace(" ", "_")}.png')
-        plt.close()
+        total_steps = np.prod([len(v) for v in param_grid.values()]) * 3  # Number of combinations times number of CV folds
+        current_step = 1
 
-    @staticmethod
-    def plot_pca_variance(pca, title):
-        plt.figure(figsize=(10, 6))
-        plt.bar(range(pca.n_components_), pca.explained_variance_ratio_, alpha=0.5, align='center')
-        plt.title(title)
-        plt.savefig(f'./plot/preprocessing/{title.replace(" ", "_")}.png')
-        plt.close()
+        best_score = -np.inf
+        best_params = None
+        all_results = []
 
-    @staticmethod
-    def plot_correlation_heatmap(df):
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
-        plt.title('Feature Correlation Heatmap')
-        plt.savefig('./plot/preprocessing/correlation_heatmap.png')
-        plt.close()
+        kf = KFold(n_splits=3)
 
-    def load_data(self, sample_fracs, random_state=42):
-        df = pd.read_csv(self.data_path, header=0)
-        print("Data loaded successfully")
-        self.plot_data_distribution(df, "Initial Data Distribution")
+        param_list = list(product(*param_grid.values()))
+        for params in param_list:
+            param_dict = dict(zip(param_grid.keys(), params))
+            fold_scores = []
+            for train_index, val_index in kf.split(self.X_train):
+                X_fold_train, X_fold_val = self.X_train[train_index], self.X_train[val_index]
+                y_fold_train, y_fold_val = self.y_train[train_index], self.y_train[val_index]
 
-        for col in df.columns[1:]:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-        print("Numerical columns converted to float")
+                model = GradientBoostingClassifier(
+                    n_estimators=param_dict['n_estimators'],
+                    learning_rate=param_dict['learning_rate'],
+                    max_depth=param_dict['max_depth'],
+                    subsample=param_dict['subsample'],
+                    min_samples_split=param_dict['min_samples_split'],
+                    random_state=42
+                )
+                model.fit(X_fold_train, y_fold_train)
+                score = model.score(X_fold_val, y_fold_val)
+                fold_scores.append(score)
 
-        df.replace([np.inf, -np.inf], np.nan, inplace=True)
-        print("Infinity values replaced with NaN")
-        #self.plot_missing_values(df, "Data with NaNs Replaced")
+                self.show_progress("Gradient Boosting", "Hyperparameter Tuning", current_step, total_steps)
+                current_step += 1
 
-        df['source'] = pd.Categorical(df['source']).codes
-        print("Target class encoded")
+            mean_score = np.mean(fold_scores)
+            all_results.append((param_dict, mean_score))
+            if mean_score > best_score:
+                best_score = mean_score
+                best_params = param_dict
 
-        # Handle missing values and remove duplicates before stratified sampling
-        df.dropna(inplace=True)
-        print("Missing values handled")
-        #self.plot_missing_values(df, "Data after Handling Missing Values")
-        df.drop_duplicates(inplace=True)
-        print("Duplicate rows removed")
-        self.plot_data_distribution(df, "Data after Removing Duplicates")
+        self.best_params_ = best_params
 
-        # Perform stratified sampling
-        df_sample = pd.concat([
-            df[df['source'] == robot_id].sample(frac=sample_fracs[robot_id], random_state=random_state)
-            for robot_id in sample_fracs
-        ])
-        print("Data shuffled and stratified sampled")
-        self.plot_data_distribution(df_sample, "Data after Stratified Sampling")
+        results_df = pd.DataFrame(all_results, columns=['params', 'mean_score'])
+        results_df.to_csv(os.path.join(self.plot_dir, 'grid_search_results.csv'), index=False)
+        self.plot_hyperparameter_performance(results_df)
 
-        # Optionally balance classes if needed
-        min_class_size = df_sample['source'].value_counts().min()
-        df_sample_balanced = pd.concat([
-            df_sample[df_sample['source'] == robot_id].sample(n=min_class_size, random_state=random_state)
-            for robot_id in df_sample['source'].unique()
-        ])
-        print("Classes balanced after stratified sampling and cleaning")
-        self.plot_data_distribution(df_sample_balanced, "Data after Balancing Classes")
+        self.model = GradientBoostingClassifier(**self.best_params_, random_state=42)
 
-        self.df_sample = df_sample_balanced
+    def plot_hyperparameter_performance(self, results_df):
+        results = pd.DataFrame(results_df['params'].tolist())
+        results['mean_score'] = results_df['mean_score']
 
-    def preprocess_data(self, apply_pca=False, n_components=5, degree=2):
-        df = self.df_sample
-        X = df.drop('source', axis=1).values
-        y = df['source'].values
-        print("Data split into features and target variable")
-        self.plot_feature_distribution(X, "Feature Distribution Before Split")
+        for param in results.columns[:-1]:
+            plt.figure(figsize=(10, 6))
+            sns.boxplot(x=param, y='mean_score', data=results)
+            plt.title(f'Hyperparameter Tuning - {param}')
+            plt.ylabel('Mean Test Score')
+            plt.xlabel(param)
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.savefig(os.path.join(self.plot_dir, f'{param}_performance.png'))
+            plt.close()
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42, stratify=y)
-        print("Data split into training and testing sets")
-        self.plot_feature_distribution(X_train, "Training Set Feature Distribution")
-        self.plot_feature_distribution(X_test, "Testing Set Feature Distribution")
+    def set_params(self, params):
+        self.model = GradientBoostingClassifier(**params, random_state=42)
+        self.best_params_ = params
 
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
-        print("Data standardized")
-        self.plot_feature_distribution(X_train_scaled, "Standardized Training Set Feature Distribution")
-        self.plot_feature_distribution(X_test_scaled, "Standardized Testing Set Feature Distribution")
+    def train_model(self):
+        print("Start fitting Gradient Boosting Model with best parameters...")
+        self.model.fit(self.X_train, self.y_train)
+        print()  # For newline after progress bar
+
+    def evaluate_model(self):
+        total_steps = 5
+        current_step = 1
+
+        y_pred = self.model.predict(self.X_test)
+        y_pred_proba = self.model.predict_proba(self.X_test)
+        self.show_progress("Gradient Boosting Model", "Evaluating", current_step, total_steps)
+        current_step += 1
+
+        accuracy = accuracy_score(self.y_test, y_pred)
+        precision = precision_score(self.y_test, y_pred, average='macro', zero_division=0)
+        recall = recall_score(self.y_test, y_pred, average='macro', zero_division=0)
+        f1 = f1_score(self.y_test, y_pred, average='macro', zero_division=0)
+        self.show_progress("Gradient Boosting Model", "Evaluating", current_step, total_steps)
+        current_step += 1
+        print("Gradient Boosting Model Accuracy:", accuracy)
+        print("Gradient Boosting Classification Report:\n", classification_report(self.y_test, y_pred))
         
-        # Add polynomial features
-        poly = PolynomialFeatures(degree=degree, interaction_only=True, include_bias=False)
-        X_train_poly = poly.fit_transform(X_train_scaled)
-        X_test_poly = poly.transform(X_test_scaled)
-        print(f"Polynomial features (degree={degree}) added")
-        self.plot_feature_distribution(X_train_poly, "Polynomial Features Training Set Distribution")
-        self.plot_feature_distribution(X_test_poly, "Polynomial Features Testing Set Distribution")
+        # Save metrics to JSON file
+        metrics = {
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1
+        }
+        with open(os.path.join(self.plot_dir, 'metrics_gb.json'), 'w') as f:
+            json.dump(metrics, f)
+        self.show_progress("Gradient Boosting Model", "Evaluating", current_step, total_steps)
+        current_step += 1
 
-        if apply_pca:
-            pca = PCA(n_components=n_components)
-            X_train_pca = pca.fit_transform(X_train_poly)
-            X_test_pca = pca.transform(X_test_poly)
-            print("PCA applied")
-            self.plot_pca_variance(pca, "PCA Explained Variance")
-            self.plot_feature_distribution(X_train_pca, "PCA Transformed Training Set Feature Distribution")
-            self.plot_feature_distribution(X_test_pca, "PCA Transformed Testing Set Feature Distribution")
-            return X_train_pca, X_test_pca, y_train, y_test, pca.explained_variance_ratio_
+        # Save ROC data
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        n_classes = len(np.unique(self.y_test))
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(self.y_test, y_pred_proba[:, i], pos_label=i)
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+        mean_tpr = np.zeros_like(all_fpr)
+        for i in range(n_classes):
+            mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+        mean_tpr /= n_classes
 
-        return X_train_poly, X_test_poly, y_train, y_test
+        roc_data = {
+            'fpr': {str(i): fpr[i].tolist() for i in fpr},
+            'tpr': {str(i): tpr[i].tolist() for i in tpr},
+            'roc_auc': {str(i): roc_auc[i] for i in roc_auc},
+            'all_fpr': all_fpr.tolist(),
+            'mean_tpr': mean_tpr.tolist()
+        }
+        with open(os.path.join(self.plot_dir, 'roc_data_gb.json'), 'w') as f:
+            json.dump(roc_data, f)
 
-    def examine_robot_data(self, robot_id, progress, total):
-        plot_dir = './plot/preprocessing'
-        os.makedirs(plot_dir, exist_ok=True)
+        # Additional plots
+        self.plot_roc_curve(y_pred_proba)
+        self.plot_confusion_matrix(y_pred)
+        self.plot_feature_importance()
 
-        Features = os.path.join(plot_dir, 'Feature' + str(robot_id) + '.png')
+        print()  # For newline after progress bar
 
-        robot_data = self.df_sample[self.df_sample['source'] == robot_id]
-
-        plt.figure(figsize=(12, 8))
-        sns.pairplot(robot_data.drop('source', axis=1))
-        plt.savefig(Features)
+    def plot_roc_curve(self, y_pred_proba):
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        n_classes = len(np.unique(self.y_test))
+        for i in range(n_classes):
+            fpr[i], tpr[i], _ = roc_curve(self.y_test, y_pred_proba[:, i], pos_label=i)
+            roc_auc[i] = auc(fpr[i], tpr[i])
+        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+        mean_tpr = np.zeros_like(all_fpr)
+        for i in range(n_classes):
+            mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+        mean_tpr /= n_classes
+        plt.figure(figsize=(10, 8))
+        colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive'])
+        for i, color in zip(range(n_classes), colors):
+            plt.plot(fpr[i], tpr[i], color=color, lw=2, label='ROC curve of class {0} (area = {1:0.2f})'.format(i, roc_auc[i]))
+        plt.plot([0, 1], [0, 1], 'k--', lw=2)
+        plt.plot(all_fpr, mean_tpr, color='navy', lw=2, linestyle='--', label='Mean ROC curve (area = {0:0.2f})'.format(auc(all_fpr, mean_tpr)))
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver Operating Characteristic (ROC) Curves')
+        plt.legend(loc="lower right")
+        plt.savefig(os.path.join(self.plot_dir, 'roc_curves.png'))
         plt.close()
 
-        missing_values = robot_data.isnull().sum()
+    def plot_confusion_matrix(self, y_pred):
+        cm = confusion_matrix(self.y_test, y_pred)
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
+        plt.xlabel('Predicted')
+        plt.ylabel('Actual')
+        plt.title('Confusion Matrix')
+        plt.savefig(os.path.join(self.plot_dir, 'confusion_matrix.png'))
+        plt.close()
 
-        prog = int((progress / total) * 30)
-        self.show_progress("Processing", prog, int((progress / total) * 100))
+    def plot_feature_importance(self):
+        feature_importance = self.model.feature_importances_
+        sorted_idx = np.argsort(feature_importance)
+        plt.figure(figsize=(10, 8))
+        plt.barh(range(len(sorted_idx)), feature_importance[sorted_idx], align='center')
+        plt.xlabel('Feature Importance')
+        plt.ylabel('Feature')
+        plt.title('Feature Importance')
+        plt.savefig(os.path.join(self.plot_dir, 'feature_importance.png'))
+        plt.close()
 
-    def save_cleaned_data(self):
-        self.df_sample.to_csv(self.processed_data_path, index=False)
+    def get_feature_importance(self):
+        feature_importance = self.model.feature_importances_
+        return feature_importance
