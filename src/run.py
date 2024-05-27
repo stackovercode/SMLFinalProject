@@ -8,14 +8,14 @@ def main():
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
     default_sample_size = 0.1
-
+    
     ########## Parameters Neural Network ##########
-    skip_NN = True
-    validate_NN_params = False
+    skip_NN = False
+    skip_validate_NN_params = False
     
     ########## Parameters Gradient Boosting ##########
-    skip_gb = False
-    validate_GB_params = False
+    skip_gb = True
+    skip_validate_GB_params = True
 
     ########## Data Preprocessing ##########
     print("\nData Preprocessing Being processed...")
@@ -52,7 +52,7 @@ def main():
         print("\nNeural Network training being processed...")
         nn = NeuralNetwork()
         nn.load_data(X_train, X_test, y_train, y_test)
-        if validate_NN_params:
+        if skip_validate_NN_params!=True:
             nn.hyperparameter_tuning()
         else:
             best_params_NN = {
@@ -74,7 +74,7 @@ def main():
         print("\nGradient Boosting training being processed...")
         gb = GradientBoosting()
         gb.load_data(X_train, X_test, y_train, y_test)
-        if validate_GB_params:
+        if skip_validate_GB_params!=True:
                 gb.hyperparameter_tuning()
         else:
             best_params_GB = {

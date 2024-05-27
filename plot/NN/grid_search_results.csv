@@ -1,0 +1,17 @@
+params,mean_score
+"{'batch_size': 128, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7628087798754374
+"{'batch_size': 128, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7687557140986124
+"{'batch_size': 128, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6520280639330546
+"{'batch_size': 128, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6525617440541586
+"{'batch_size': 128, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.784004271030426
+"{'batch_size': 128, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7796584367752075
+"{'batch_size': 128, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6780268351236979
+"{'batch_size': 128, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6652943094571432
+"{'batch_size': 256, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7680695454279581
+"{'batch_size': 256, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7539646029472351
+"{'batch_size': 256, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.643260141213735
+"{'batch_size': 256, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6256480614344279
+"{'batch_size': 256, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7609789570172628
+"{'batch_size': 256, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7670021255811056
+"{'batch_size': 256, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6546965638796488
+"{'batch_size': 256, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6383806069691976

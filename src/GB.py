@@ -1,5 +1,4 @@
 import json
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc, confusion_matrix, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
@@ -18,6 +17,7 @@ class GradientBoosting:
         os.makedirs(self.plot_dir, exist_ok=True)
         self.model = None
         self.best_params_ = None
+        self.n_classes = None
 
     @staticmethod
     def show_progress(label, phase, current, total):
@@ -31,19 +31,31 @@ class GradientBoosting:
         self.X_test = X_test
         self.y_train = y_train
         self.y_test = y_test
+        self.n_classes = len(np.unique(y_test))
         
         # Print dataset sizes
         print(f"Training data shape: X_train={self.X_train.shape}, y_train={self.y_train.shape}")
         print(f"Testing data shape: X_test={self.X_test.shape}, y_test={self.y_test.shape}")
+        
+        # Save y_test to a JSON file
+        with open(os.path.join(self.plot_dir, 'test_labels.json'), 'w') as f:
+            json.dump(y_test.tolist(), f)
 
 
     def hyperparameter_tuning(self):
+        # param_grid = {
+        #     'n_estimators': [100, 200, 300],
+        #     'learning_rate': [0.01, 0.1, 0.2],
+        #     'max_depth': [3, 4, 5],
+        #     'subsample': [0.8, 1.0, 1.2],
+        #     'min_samples_split': [2, 5, 10]
+        # }
         param_grid = {
-            'n_estimators': [100, 200],
-            'learning_rate': [0.01, 0.1],
-            'max_depth': [3, 4],
-            'subsample': [0.8, 1.0],
-            'min_samples_split': [2, 5]
+            'n_estimators': [150, 225],
+            'learning_rate': [0.05, 0.15],
+            'max_depth': [3, 5],
+            'subsample': [1.0, 1.2],
+            'min_samples_split': [3, 6]
         }
 
         total_steps = np.prod([len(v) for v in param_grid.values()]) * 3  # Number of combinations times number of CV folds
@@ -171,12 +183,17 @@ class GradientBoosting:
         with open(os.path.join(self.plot_dir, 'roc_data_gb.json'), 'w') as f:
             json.dump(roc_data, f)
 
+
+        cm = confusion_matrix(self.y_test, y_pred)
+        #np.save(os.path.join(self.plot_dir, 'gb_confusion_matrix.npy'), cm) 
+    
         # Additional plots
         self.plot_roc_curve(y_pred_proba)
-        self.plot_confusion_matrix(y_pred)
+        self.plot_confusion_matrix(cm, classes=np.unique(self.y_test))
         self.plot_feature_importance()
 
         print()  # For newline after progress bar
+    
 
     def plot_roc_curve(self, y_pred_proba):
         fpr = dict()
@@ -207,12 +224,12 @@ class GradientBoosting:
         plt.savefig(os.path.join(self.plot_dir, 'roc_curves.png'))
         plt.close()
 
-    def plot_confusion_matrix(self, y_pred):
-        cm = confusion_matrix(self.y_test, y_pred)
+    def plot_confusion_matrix(self,cm, classes):
+        #cm = confusion_matrix(self.y_test, y_pred)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
+        plt.xlabel('Predicted Label')
+        plt.ylabel('Actual Label')
         plt.title('Confusion Matrix')
         plt.savefig(os.path.join(self.plot_dir, 'confusion_matrix.png'))
         plt.close()
