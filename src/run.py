@@ -2,20 +2,22 @@ from preprocessing import Preprocessing
 from NN import NeuralNetwork
 from GB import GradientBoosting
 from compare import ModelComparison
+import numpy as np
+
 
 def main():
     
     data_path = './data/4_Classification of Robots from their conversation sequence_Set2.csv'
     processed_data_path = './data/cleaned_robot_data.csv'
-    default_sample_size = 0.1
+    default_sample_size = 0.33
     
     ########## Parameters Neural Network ##########
     skip_NN = False
     skip_validate_NN_params = False
     
     ########## Parameters Gradient Boosting ##########
-    skip_gb = True
-    skip_validate_GB_params = True
+    skip_gb = False
+    skip_validate_GB_params = False
 
     ########## Data Preprocessing ##########
     print("\nData Preprocessing Being processed...")
@@ -40,6 +42,12 @@ def main():
 
     # Apply PCA during preprocessing
     X_train, X_test, y_train, y_test, explained_variance_ratio = preprocessor.preprocess_data(apply_pca=True)
+    print("From Run: Class distribution in training set:", np.bincount(y_train))
+    print("From Run: Class distribution in testing set:", np.bincount(y_test))
+    # print("From Run: Class distribution in training set:")
+    # print(np.sum(y_train, axis=0))
+    # print("From Run: Class distribution in testing set:")
+    # print(np.sum(y_test, axis=0))
     print("\nData Preprocessing Complete.")
 
     ##########################################
@@ -56,9 +64,9 @@ def main():
             nn.hyperparameter_tuning()
         else:
             best_params_NN = {
-            'model__activation': 'relu',
+            'model__activation': 'leaky_relu',
             'model__optimizer': 'adam',
-            'model__dropout_rate': 0.2,
+            'model__dropout_rate': 0.5,
             'batch_size': 32,
             'epochs': 100
             }
@@ -81,7 +89,7 @@ def main():
                 'n_estimators': 200,
                 'learning_rate': 0.1,
                 'max_depth': 3,
-                'subsample': 1.0,
+                'subsample': 0.8,
                 'min_samples_split': 2
             }
             gb.set_params(best_params_GB)

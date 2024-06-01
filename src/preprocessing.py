@@ -147,7 +147,10 @@ class Preprocessing:
         self.plot_data_distribution(df_sample_balanced, "Data after Balancing Classes")
 
         self.df_sample = df_sample_balanced
-
+        # print("In load df.samlpe: data.shape", self.df_sample.shape)
+        # print("In load df.samlpe: data.head()", self.df_sample.head())
+        # print("In load df.samlpe: data.tail()", self.df_sample.tail())
+        
     def preprocess_data(self, apply_pca=False, n_components=5, degree=2):
         df = self.df_sample
         X = df.drop('source', axis=1).values
@@ -183,8 +186,15 @@ class Preprocessing:
             self.plot_pca_variance(pca, "PCA Explained Variance")
             self.plot_feature_distribution(X_train_pca, "PCA Transformed Training Set Feature Distribution")
             self.plot_feature_distribution(X_test_pca, "PCA Transformed Testing Set Feature Distribution")
+            
+            # print("PCA True: In preprocs df.samlpe: data.shape", df.shape)
+            # print("PCA True: In preprocs df.samlpe: data.head()", df.head())
+            # print("PCA True: In preprocs df.samlpe: data.tail()", df.tail())
             return X_train_pca, X_test_pca, y_train, y_test, pca.explained_variance_ratio_
-
+    
+        # print("PCA false: In load df.samlpe: data.shape", df)
+        # print("PCA false: In load df.samlpe: data.head()", df.head())
+        # print("PCA false: In load df.samlpe: data.tail()", df.tail())
         return X_train_poly, X_test_poly, y_train, y_test
 
     def examine_robot_data(self, robot_id, progress, total):

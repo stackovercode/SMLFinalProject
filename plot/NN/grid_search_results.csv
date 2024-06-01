@@ -1,17 +1,97 @@
 params,mean_score
-"{'batch_size': 128, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7628087798754374
-"{'batch_size': 128, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7687557140986124
-"{'batch_size': 128, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6520280639330546
-"{'batch_size': 128, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6525617440541586
-"{'batch_size': 128, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.784004271030426
-"{'batch_size': 128, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7796584367752075
-"{'batch_size': 128, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6780268351236979
-"{'batch_size': 128, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6652943094571432
-"{'batch_size': 256, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7680695454279581
-"{'batch_size': 256, 'epochs': 150, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7539646029472351
-"{'batch_size': 256, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.643260141213735
-"{'batch_size': 256, 'epochs': 150, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6256480614344279
-"{'batch_size': 256, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.7609789570172628
-"{'batch_size': 256, 'epochs': 200, 'model__activation': 'tanh', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.7670021255811056
-"{'batch_size': 256, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.4, 'model__optimizer': 'adam'}",0.6546965638796488
-"{'batch_size': 256, 'epochs': 200, 'model__activation': 'sigmoid', 'model__dropout_rate': 0.5, 'model__optimizer': 'adam'}",0.6383806069691976
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7496950427691141
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6952577034632365
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7501524686813354
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6845074892044067
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7524397770563761
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6314425269762675
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7409271200497946
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6082647144794464
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7591491341590881
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6925129493077596
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7596065799395243
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6116956472396851
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7610551913579305
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6333485841751099
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7695943911870321
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6864135464032491
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7560231685638428
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6800853808720907
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7577767769495646
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6445562839508057
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7478652000427246
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.5976669689019521
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7649435599644979
+"{'batch_size': 32, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6768069465955099
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7733302712440491
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6933516263961792
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7673071026802063
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.7149283289909363
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7511436343193054
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6423452297846476
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.75594695409139
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6940378149350485
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7654010454813639
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6174900929133097
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7734065453211466
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.722933828830719
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7608264684677124
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.7000610033671061
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7672308683395386
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6469198067982992
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7748551170031229
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6964775919914246
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7635712027549744
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.628621518611908
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7739402055740356
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6204635500907898
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7618938883145651
+"{'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6759682893753052
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7538121342658997
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6290027697881063
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.749999980131785
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6344922184944153
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7397072315216064
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6088746587435404
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7496950229008993
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6184050043423971
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7501524885495504
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6550015211105347
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7555657227834066
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6463861068089803
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7471027572949728
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6440225640932719
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.749008854230245
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.646004875500997
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.756938099861145
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.5759377876917521
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7461878856023153
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.5846294562021891
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7549557685852051
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.5770051876703898
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7549557685852051
+"{'batch_size': 64, 'epochs': 50, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.5511588851610819
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7581579685211182
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6752058664957682
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7552607655525208
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6664379239082336
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7587679227193197
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6808478236198425
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7650198340415955
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'leaky_relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6466910640398661
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7589203914006551
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6775693694750468
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7621226112047831
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6850411891937256
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.761436402797699
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6735285123189291
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7583867112795512
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'relu', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6755870580673218
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7623513340950012
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6279353698094686
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7689844369888306
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6388380527496338
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}",0.7637999455134074
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.005, 'model__optimizer': 'sgd'}",0.6351784070332845
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'adam'}",0.7702805797259012
+"{'batch_size': 64, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.2, 'model__learning_rate': 0.01, 'model__optimizer': 'sgd'}",0.6080359816551208
