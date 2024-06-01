@@ -13,7 +13,7 @@ def main():
     
     ########## Parameters Neural Network ##########
     skip_NN = False
-    skip_validate_NN_params = False
+    skip_validate_NN_params = True
     
     ########## Parameters Gradient Boosting ##########
     skip_gb = False
@@ -63,12 +63,19 @@ def main():
         if skip_validate_NN_params!=True:
             nn.hyperparameter_tuning()
         else:
+            # best_params_NN = {
+            # 'model__activation': 'leaky_relu',
+            # 'model__optimizer': 'adam',
+            # 'model__dropout_rate': 0.5,
+            # 'batch_size': 32,
+            # 'epochs': 100
+            # }
             best_params_NN = {
-            'model__activation': 'leaky_relu',
+            'model__activation': 'tanh',
             'model__optimizer': 'adam',
-            'model__dropout_rate': 0.5,
+            'model__dropout_rate': 0.1,
             'batch_size': 32,
-            'epochs': 100
+            'epochs': 75
             }
             nn.set_params(best_params_NN)
         nn.train_model()

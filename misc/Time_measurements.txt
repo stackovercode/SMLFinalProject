@@ -1,0 +1,5 @@
+TEST 33%
+NN = Best: 0.7748551170031229 using {'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}
+
+Traning time NN:
+Total time for NN training: 34.39

@@ -19,16 +19,15 @@ warnings.filterwarnings("ignore", message="Do not pass an `input_shape`/`input_d
 warnings.filterwarnings("ignore")
 
 
-def create_model(activation='tanh', optimizer='adam', learning_rate=0.005, dropout_rate=0.2, input_shape=5, n_classes=5):
-#def create_model(activation='tanh', optimizer='sgd', learning_rate=0.001, dropout_rate=0.5, input_shape=5, n_classes=5):
+def create_model(activation='tanh', optimizer='adam', learning_rate=0.005, dropout_rate=0.1, input_shape=5, n_classes=5):
     model = tf.keras.models.Sequential()
     model.add(tf.keras.Input(shape=(input_shape,)))
     #model.add(tf.keras.layers.Dense(128, activation=activation))
     #model.add(tf.keras.layers.Dropout(dropout_rate))
     #model.add(tf.keras.layers.Dense(64, activation=activation))
-    model.add(tf.keras.layers.Dense(64, activation=activation))  # Reduced number of neurons
+    model.add(tf.keras.layers.Dense(64, activation=activation)) 
     model.add(tf.keras.layers.Dropout(dropout_rate))
-    model.add(tf.keras.layers.Dense(32, activation=activation))  # Reduced number of neurons
+    model.add(tf.keras.layers.Dense(32, activation=activation)) 
     model.add(tf.keras.layers.Dense(n_classes, activation='softmax'))
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     
