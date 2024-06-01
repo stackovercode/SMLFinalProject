@@ -33,6 +33,34 @@ class ModelComparison:
         with open(os.path.join(self.gb_dir, 'roc_data_gb.json'), 'r') as f:
             self.gb_roc_data = json.load(f)
 
+
+    def compare_roc_curves(self):
+        plt.figure(figsize=(10, 8))
+        
+        # Plot NN ROC curve
+        for i in range(len(self.nn_roc_data['fpr'])):
+            if str(i) in self.nn_roc_data['fpr'] and str(i) in self.nn_roc_data['tpr']:
+                plt.plot(self.nn_roc_data['fpr'][str(i)], self.nn_roc_data['tpr'][str(i)], lw=2,
+                         label=f'NN ROC curve of class {i} (area = {self.nn_roc_data["roc_auc"][str(i)]:0.2f})')
+        
+        # Plot GB ROC curve
+        for i in range(len(self.gb_roc_data['fpr'])):
+            if str(i) in self.gb_roc_data['fpr'] and str(i) in self.gb_roc_data['tpr']:
+                plt.plot(self.gb_roc_data['fpr'][str(i)], self.gb_roc_data['tpr'][str(i)], lw=2, linestyle='--',
+                         label=f'GB ROC curve of class {i} (area = {self.gb_roc_data["roc_auc"][str(i)]:0.2f})')
+
+        plt.plot([0, 1], [0, 1], 'k--', lw=2)
+        plt.xlim([-0.05, 1.05])
+        plt.ylim([-0.05, 1.05])
+        plt.xlabel('False Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
+        plt.ylabel('True Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
+        plt.title('Receiver Operating Characteristic (ROC) Curves', fontsize=plt.rcParams['axes.titlesize'])
+        plt.legend(loc="lower right",  prop={'size': plt.rcParams['legend.fontsize']})
+        plt.grid(alpha=0.4)
+        plt.savefig(os.path.join(self.output_dir, 'ROC_curve_comparison.png'))
+        plt.close()
+
+
     # def compare_roc_curves(self):
     #     plt.figure(figsize=(10, 8))
         
@@ -59,30 +87,30 @@ class ModelComparison:
     #     plt.close()
 
 
-    def compare_roc_curves(self):
-        plt.figure(figsize=(10, 8))
+    # def compare_roc_curves(self):
+    #     plt.figure(figsize=(10, 8))
         
-        # Plot NN ROC curve
-        for i in range(len(self.nn_roc_data['fpr'])):
-            plt.plot(self.nn_roc_data['fpr'][str(i)], self.nn_roc_data['tpr'][str(i)], lw=2,
-                    label=f'NN ROC curve of class {i} (area = {self.nn_roc_data["roc_auc"][str(i)]:0.2f})')
+    #     # Plot NN ROC curve
+    #     for i in range(len(self.nn_roc_data['fpr'])):
+    #         plt.plot(self.nn_roc_data['fpr'][str(i)], self.nn_roc_data['tpr'][str(i)], lw=2,
+    #                 label=f'NN ROC curve of class {i} (area = {self.nn_roc_data["roc_auc"][str(i)]:0.2f})')
         
-        # Plot GB ROC curve
-        for i in range(len(self.gb_roc_data['fpr'])):
-            if str(i) in self.gb_roc_data['fpr']:
-                plt.plot(self.gb_roc_data['fpr'][str(i)], self.gb_roc_data['tpr'][str(i)], lw=2, linestyle='--',
-                        label=f'GB ROC curve of class {i} (area = {self.gb_roc_data["roc_auc"][str(i)]:0.2f})')
+    #     # Plot GB ROC curve
+    #     for i in range(len(self.gb_roc_data['fpr'])):
+    #         if str(i) in self.gb_roc_data['fpr']:
+    #             plt.plot(self.gb_roc_data['fpr'][str(i)], self.gb_roc_data['tpr'][str(i)], lw=2, linestyle='--',
+    #                     label=f'GB ROC curve of class {i} (area = {self.gb_roc_data["roc_auc"][str(i)]:0.2f})')
 
-        plt.plot([0, 1], [0, 1], 'k--', lw=2)
-        plt.xlim([-0.05, 1.05])
-        plt.ylim([-0.05, 1.05])
-        plt.xlabel('False Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
-        plt.ylabel('True Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
-        plt.title('Receiver Operating Characteristic (ROC) Curves', fontsize=plt.rcParams['axes.titlesize'])
-        plt.legend(loc="lower right", prop={'size': plt.rcParams['legend.fontsize']})
-        plt.grid(alpha=0.4)
-        plt.savefig(os.path.join(self.output_dir, 'ROC_curve_comparison.png'))
-        plt.close()
+    #     plt.plot([0, 1], [0, 1], 'k--', lw=2)
+    #     plt.xlim([-0.05, 1.05])
+    #     plt.ylim([-0.05, 1.05])
+    #     plt.xlabel('False Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
+    #     plt.ylabel('True Positive Rate', fontsize=plt.rcParams['axes.labelsize'])
+    #     plt.title('Receiver Operating Characteristic (ROC) Curves', fontsize=plt.rcParams['axes.titlesize'])
+    #     plt.legend(loc="lower right", prop={'size': plt.rcParams['legend.fontsize']})
+    #     plt.grid(alpha=0.4)
+    #     plt.savefig(os.path.join(self.output_dir, 'ROC_curve_comparison.png'))
+    #     plt.close()
 
 
     def compare_metrics(self):

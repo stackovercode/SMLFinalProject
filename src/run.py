@@ -12,12 +12,12 @@ def main():
     default_sample_size = 0.33
     
     ########## Parameters Neural Network ##########
-    skip_NN = False
+    skip_NN = True
     skip_validate_NN_params = True
     
     ########## Parameters Gradient Boosting ##########
     skip_gb = False
-    skip_validate_GB_params = False
+    skip_validate_GB_params = True
 
     ########## Data Preprocessing ##########
     print("\nData Preprocessing Being processed...")
@@ -92,12 +92,19 @@ def main():
         if skip_validate_GB_params!=True:
                 gb.hyperparameter_tuning()
         else:
+            # best_params_GB = {
+            #     'n_estimators': 200,
+            #     'learning_rate': 0.1,
+            #     'max_depth': 3,
+            #     'subsample': 0.8,
+            #     'min_samples_split': 2
+            # }
             best_params_GB = {
-                'n_estimators': 200,
-                'learning_rate': 0.1,
-                'max_depth': 3,
-                'subsample': 0.8,
-                'min_samples_split': 2
+                'n_estimators': 150,
+                'learning_rate': 0.05,
+                'max_depth': 5,
+                'subsample': 0.5,
+                'min_samples_split': 6
             }
             gb.set_params(best_params_GB)
         gb.train_model()

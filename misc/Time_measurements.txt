@@ -1,5 +1,17 @@
 TEST 33%
+
+% NEURAL NETWORK
 NN = Best: 0.7748551170031229 using {'batch_size': 32, 'epochs': 75, 'model__activation': 'tanh', 'model__dropout_rate': 0.1, 'model__learning_rate': 0.005, 'model__optimizer': 'adam'}
 
 Traning time NN:
 Total time for NN training: 34.39
+
+
+
+%%%% GRADIENT BOOSTING
+
+GB = Best: 0.7832418420250077 using {'n_estimators': 150, 'learning_rate': 0.05, 'max_depth': 5, 'subsample': 0.5, 'min_samples_split': 6}
+
+Total time for GB hyperparameter tuning: hours=0.24, minutes=14.16, seconds=849.51
+
+Total time for GB training: hours=0.00, minutes=0.15, seconds=9.14
